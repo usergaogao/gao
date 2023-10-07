@@ -1,0 +1,712 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_PATIENTS 100
+#define MAX_WARDS 50
+#define MAX_BEDS 200
+#define MAX_ADMISSIONS 200
+#define OPTION_WELCOME 0
+
+// 定义患者结构体
+typedef struct {
+    int patientId;
+    char name[50];
+    char gender[10];
+    char ethnicity[20];
+    char dob[20];
+    char contactNumber[20];
+    char alternateNumber[20];
+    char keyword[100];
+} Patient;
+//文件路径
+const char patientRecordsFile[] = "C:\\Users\\gaoji\\Desktop\\资料\\病床管理系统\\data.txt";
+
+// 定义病房结构体
+struct Ward {
+    int buildingNumber;
+    int floorNumber;
+    int roomNumber;
+    char department[50];
+    int bedCount;
+    char type[20];
+};
+
+// 定义病床结构体
+typedef struct {
+    int bedId;
+    int bedNumber;
+    int roomNumber;
+    char status[20];
+} Bed;
+
+// 定义入住关系结构体
+typedef struct {
+    int admissionId;
+    int patientId;
+    int hospitalizationNumber;
+    char department[50];
+    int roomNumber;
+    int bedNumber;
+    char checkInTime[20];
+    char checkOutTime[20];
+    char status[20];
+    char remarks[100];
+} Admission;
+
+// 全局变量
+Patient patients[MAX_PATIENTS];
+int patientCount = 0;
+
+Ward wards[MAX_WARDS];
+int wardCount = 0;
+
+Bed beds[MAX_BEDS];
+int bedCount = 0;
+
+Admission admissions[MAX_ADMISSIONS];
+int admissionCount = 0;
+
+// 函数声明
+void addPatient();
+void deletePatient();
+void modifyPatient();
+void listPatients();
+
+void addWard();
+void deleteWard();
+void modifyWard();
+void listWards();
+
+void addBed();
+void deleteBed();
+void modifyBed();
+void listBeds();
+
+void saveData();
+void loadData();
+void searchPatient();
+void searchBed(); 
+#include <stdio.h>
+#include <stdlib.h>
+
+// 主函数
+int main() {
+    int choice;
+
+    // 加载数据
+    loadData();
+    
+    // 程序主循环
+    while (1) {
+        printf("====================================\n");
+        printf("(:欢迎使用病房管理系统:)\n");
+        printf("====================================\n");
+        printf("功能选项：\n");
+        printf("1. 病人信息管理\n");
+        printf("2. 病房信息管理\n");
+        printf("3. 查询功能\n");
+        printf("0. 退出系统\n");
+        printf("====================================\n");
+        printf("请输入要执行的功能选项：");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                while (1) {
+                    printf("1. 增加患者\n");
+                    printf("2. 删除患者\n");
+                    printf("3. 修改患者信息\n");
+                    printf("4. 列出患者信息\n");
+                    printf("5. 增加就诊记录\n");
+                    pritnf("6.删除就诊记录\n"); 
+                    printf("0. 返回主菜单\n");
+                    printf("请输入要执行的功能选项：");
+                    scanf("%d", &choice);
+                    
+                    switch (choice) {
+                        case 1:
+                            addPatient();
+                            break;
+                        case 2:
+                            deletePatient();
+                            break;
+                        case 3:
+                            modifyPatient();
+                            break;
+                        case 4:
+                            listPatients();
+                            break;
+                        case 0:
+                            goto MAIN_MENU;
+                        default:
+                            printf("无效的选项，请重新输入。\n");
+                            break;
+                    }
+                }
+                break;
+            case 2:
+                while (1) {
+                    printf("1. 增加病房\n");
+                    printf("2. 删除病房\n");
+                    printf("3. 修改病房信息\n");
+                    printf("4. 列出病房信息\n");
+                    printf("5. 增加病床\n");
+                    printf("6. 删除病床\n");
+                    printf("7. 修改病床信息\n");
+                    printf("8. 列出病床信息\n");
+                    printf("0. 返回主菜单\n");
+                    printf("请输入要执行的功能选项：");
+                    scanf("%d", &choice);
+
+                    switch (choice){
+                        case 1:
+                            addWard();
+                            break;
+                        case 2:
+                            deleteWard();
+                            break;
+                        case 3:
+                            modifyWard();
+                            break;
+                        case 4:
+                            listWards();
+                            break;
+                        case 5:
+                            addBed();
+                            break;
+                        case 6:
+                            deleteBed();
+                            break;
+                        case 7:
+                            modifyBed();
+                            break;
+                        case 8:
+                            listBeds();
+                            break;
+                        case 0:
+                            goto MAIN_MENU;
+                        default:
+                            printf("无效的选项，请重新输入。\n");
+                            break;
+                    }
+                }
+                break;
+            case 3:
+                printf("1. 查找病人信息\n");
+                printf("2. 查找病床信息\n");
+                printf("3.") ;
+                printf("请输入需要执行的功能选项："); 
+                scanf("%d", &choice);
+                
+                switch (choice){
+                    case 1:	
+                        searchPatient();
+                        break;
+                    case 2:
+                    	searchBed();
+                    	break;
+                    default:
+                        printf("无效的选项，请重新输入。\n");
+                        break;
+                }
+                break;
+            case 0:
+                printf("感谢使用病房管理系统，再见！\n");
+                exit(0);
+            default:
+                printf("输入无效，请选择菜单里的内容哦。\n");
+                break;
+        }
+        
+        MAIN_MENU:
+        printf("返回主菜单...\n\n");
+    }
+
+    printf("感谢使用我的病房管理系统，再见！\n");
+    return 0;
+}
+
+// 增加患者
+void addPatient() {
+    if (patientCount >= MAX_PATIENTS) {
+        printf("患者记录已满，无法添加新的患者。\n");
+        return;
+    }
+
+    Patient patient;
+    
+    printf("请输入患者就诊号：");
+    scanf("%d", &patient.patientId);
+
+    // 检查患者就诊号是否已存在
+    for (int i = 0; i < patientCount; i++) {
+        if (patients[i].patientId == patient.patientId) {
+            printf("患者就诊号已存在，请重新输入。\n");
+            return;
+        }
+    }
+    
+    printf("请输入患者姓名：");
+    scanf("%s", patient.name);
+    printf("请输入患者性别：");
+    scanf("%s", patient.gender);
+    printf("请输入患者族别：");
+    scanf("%s", patient.ethnicity);
+    printf("请输入患者出生年月：");
+    scanf("%s", patient.dob);
+    printf("请输入患者联系电话：");
+    scanf("%s", patient.contactNumber);
+    printf("请输入患者备用电话：");
+    scanf("%s", patient.alternateNumber);
+    
+    patients[patientCount++] = patient;
+    
+    printf("患者信息已添加。\n");
+}
+// 删除患者
+void deletePatient() {
+    if (patientCount == 0) {
+        printf("暂无患者记录。\n");
+        return;
+    }
+
+    int patientId, found = 0;
+
+    printf("请输入要删除的患者就诊号：");
+    scanf("%d", &patientId);
+
+    for (int i = 0; i < patientCount; i++) {
+        if (patients[i].patientId == patientId) {
+            found = 1;
+
+            // 清空该患者记录
+            memset(&patients[i], 0, sizeof(Patient));
+
+            // 将该位置后面的患者记录向前移动
+            for (int j = i; j < patientCount - 1; j++) {
+                patients[j] = patients[j + 1];
+            }
+
+            patientCount--;
+            printf("患者信息已删除。\n");
+            break;
+        }
+    }
+
+    if (!found) {
+        printf("未找到对应的患者记录。\n");
+    }
+}
+
+
+// 修改患者信息
+void modifyPatient() {
+    if (patientCount == 0) {
+        printf("暂无患者记录。\n");
+        return;
+    }
+    
+    int patientId, found = 0;
+    Patient updatedPatient;
+    
+    printf("请输入要修改的患者就诊号：");
+    scanf("%d", &patientId);
+    
+    for (int i = 0; i < patientCount; i++) {
+        if (patients[i].patientId == patientId) {
+            found = 1;
+            
+            printf("原患者姓名：%s\n原患者性别：%s\n", patients[i].name,patients[i].gender);
+            printf("请输入新的患者姓名:\n");
+            printf("原患者性别:\n");
+            scanf("%s%s", updatedPatient.name,updatedPatient.gender);
+
+            strcpy(patients[i].name, updatedPatient.name);
+            strcpy(patients[i].gender, updatedPatient.gender);
+			
+            printf("患者信息已修改。\n");
+            break;
+        }
+    }
+    
+    if (!found) {
+        printf("未找到对应的患者记录。\n");
+    }
+}
+
+// 列出患者信息
+void listPatients() {
+    if (patientCount == 0) {
+        printf("暂无患者记录。\n");
+        return;
+    }
+
+    printf("======= 患者信息列表 =======\n");
+    for (int i = 0; i < patientCount; i++) {
+        printf("就诊号：%d\t姓名：%s\t性别：%s\t族别：%s\t生日：%s\t联系电话：%s\t备用电话：%s\n",
+                patients[i].patientId, patients[i].name, patients[i].gender,
+                patients[i].ethnicity, patients[i].dob, patients[i].contactNumber,
+                patients[i].alternateNumber);
+    }
+}
+
+/// 增加病房
+void addWard() {
+    if (wardCount >= MAX_WARDS) {
+        printf("病房记录已满，无法添加新的病房。\n");
+        return;
+    }
+
+    Ward ward;
+    
+    // 格式化输入的病床录入
+    printf("请输入病床录入，格式为 楼宇号-楼层号-房间号：");
+    scanf("%d-%d-%d", &ward.buildingNumber, &ward.floorNumber, &ward.roomNumber);
+    getchar(); // 清除输入缓冲区中的换行符
+    
+    // 检查病房号是否已存在
+    for (int i = 0; i < wardCount; i++) {
+        if (wards[i].roomNumber == ward.roomNumber) {
+            printf("病房号已存在，请重新输入。\n");
+            return;
+        }
+    }
+    
+    printf("请输入病房所属科室：");
+    fgets(ward.department, sizeof(ward.department), stdin);
+    ward.department[strcspn(ward.department, "\n")] = '\0'; // 去除换行符
+    
+    printf("请输入病床数：");
+    scanf("%d", &ward.bedCount);
+    getchar();
+    
+    printf("请输入病房类型：");
+    fgets(ward.type, sizeof(ward.type), stdin);
+    ward.type[strcspn(ward.type, "\n")] = '\0'; // 去除换行符
+    
+    wards[wardCount++] = ward;
+    
+    printf("病房信息已添加。\n");
+}
+
+// 删除病房
+void deleteWard() {
+    if (wardCount == 0) {
+        printf("暂无病房记录。\n");
+        return;
+    }
+
+    int roomNumber, found = 0;
+
+    printf("请输入要删除的病房号：");
+    scanf("%d", &roomNumber);
+
+    for (int i = 0; i < wardCount; i++) {
+        if (wards[i].roomNumber == roomNumber) {
+            found = 1;
+
+            // 将该位置后面的病房记录向前移动
+            for (int j = i; j < wardCount - 1; j++) {
+                wards[j] = wards[j + 1];
+            }
+
+            wardCount--;
+            printf("病房信息已删除。\n");
+            break;
+        }
+    }
+
+    if (!found) {
+        printf("未找到对应的病房记录。\n");
+    }
+}
+
+// 修改病房信息
+void modifyWard() {
+    if (wardCount == 0) {
+        printf("暂无病房记录。\n");
+        return;
+    }
+
+    int roomNumber, found = 0;
+    Ward updatedWard;
+    
+    printf("请输入要修改的病房号：");
+    scanf("%d", &roomNumber);
+    
+    for (int i = 0; i < wardCount; i++) {
+        if (wards[i].roomNumber == roomNumber) {
+            found = 1;
+
+            printf("原病房所属科室：%s\n", wards[i].department);
+            printf("请输入新的病房所属科室：");
+            scanf("%s", updatedWard.department);
+
+            strcpy(wards[i].department, updatedWard.department);
+            
+            printf("病房信息已修改。\n");
+            break;
+        }
+    }
+    
+    if (!found) {
+        printf("未找到对应的病房记录。\n");
+    }
+}
+
+// 列出病房信息
+void listWards() {
+    if (wardCount == 0) {
+        printf("暂无病房记录。\n");
+        return;
+    }
+
+    printf("======= 病房信息列表 =======\n");
+    for (int i = 0; i < wardCount; i++) {
+        printf("楼宇号：%d\t楼层号：%d\t科室：%s\t病房号：%d\t床位数：%d\t类型：%s\n",
+                wards[i].buildingNumber, wards[i].floorNumber,
+                wards[i].department, wards[i].roomNumber,
+                wards[i].bedCount, wards[i].type);
+    }
+}
+
+// 增加病床
+void addBed() {
+    if (bedCount >= MAX_BEDS) {
+        printf("病床记录已满，无法添加新的病床。\n");
+        return;
+    }
+    
+    Bed bed;
+    
+    printf("请输入病床号：");
+    scanf("%d", &bed.bedId);
+    printf("请输入床位号：");
+    scanf("%d", &bed.bedNumber);
+
+    // 检查床位号是否已存在
+    for (int i = 0; i < bedCount; i++) {
+        if (beds[i].bedNumber == bed.bedNumber) {
+            printf("床位号已存在，请重新输入。\n");
+            return;
+        }
+    }
+
+    printf("请输入病房号：");
+    scanf("%d", &bed.roomNumber);
+    printf("请输入病床状态：");
+    scanf("%s", bed.status);
+    
+    beds[bedCount++] = bed;
+    
+    printf("病床信息已添加。\n");
+}
+
+// 删除病床
+void deleteBed() {
+    if (bedCount == 0) {
+        printf("暂无病床记录。\n");
+        return;
+    }
+
+    int bedNumber, found = 0;
+
+    printf("请输入要删除的床位号：");
+    scanf("%d", &bedNumber);
+
+    for (int i = 0; i < bedCount; i++) {
+        if (beds[i].bedNumber == bedNumber) {
+            found = 1;
+
+            // 将该位置后面的病床记录向前移动
+            for (int j = i; j < bedCount - 1; j++) {
+                beds[j] = beds[j + 1];
+            }
+
+            bedCount--;
+            printf("病床信息已删除。\n");
+            break;
+        }
+    }
+
+    if (!found) {
+        printf("未找到对应的病床记录。\n");
+    }
+}
+
+// 修改病床信息
+void modifyBed() {
+    if (bedCount == 0) {
+        printf("暂无病床记录。\n");
+        return;
+    }
+
+    int bedNumber, found = 0;
+    Bed updatedBed;
+    
+    printf("请输入要修改的床位号：");
+    scanf("%d", &bedNumber);
+    
+    for (int i = 0; i < bedCount; i++) {
+        if (beds[i].bedNumber == bedNumber) {
+            found = 1;
+
+            printf("原病床状态：%s\n", beds[i].status);
+            printf("请输入新的病床状态：");
+            scanf("%s", updatedBed.status);
+
+            strcpy(beds[i].status, updatedBed.status);
+            
+            printf("病床信息已修改。\n");
+            break;
+        }
+    }
+    
+    if (!found) {
+        printf("未找到对应的病床记录。\n");
+    }
+}
+
+// 列出病床信息
+void listBeds() {
+    if (bedCount == 0) {
+        printf("暂无病床记录。\n");
+        return;
+    }
+
+    printf("======= 病床信息列表 =======\n");
+    for (int i = 0; i < bedCount; i++) {
+        printf("病床号：%d\t床位号：%d\t病房号：%d\t状态：%s\n",
+                beds[i].bedId, beds[i].bedNumber,
+                beds[i].roomNumber, beds[i].status);
+    }
+}
+// 通过病人ID查找病人信息
+void searchPatient() {
+    int patientId;
+    printf("请输入要查找的病人的ID：");
+    scanf("%d", &patientId);
+
+    int found = 0;
+    printf("======= 查找结果 =======\n");
+    for (int i = 0; i < patientCount; i++) {
+        if (patients[i].patientId == patientId) {
+            printf("病人ID：%d\t姓名：%s\t性别：%s\t种族：%s\t出生日期：%s\t联系电话：%s\t备用电话：%s\n",
+                    patients[i].patientId, patients[i].name, patients[i].gender,
+                    patients[i].ethnicity, patients[i].dob, patients[i].contactNumber,
+                    patients[i].alternateNumber);
+            found = 1;
+            break;
+        }
+    }
+
+    if (!found) {
+        printf("未找到匹配的病人。\n");
+    }
+}
+// 通过楼宇号-楼层号-房间号查找病床信息
+void searchBed() {
+    int buildingNumber, floorNumber, roomNumber; 
+    printf("请输入要查找的楼宇号-楼层号-房间号:");
+    scanf("%d-%d-%d", &buildingNumber, &floorNumber, &roomNumber);
+
+    int found = 0;
+    printf("======= 查找结果 =======\n");
+    for (int i = 0; i < patientCount; i++) {
+        if (wards[i].buildingNumber == buildingNumber &&
+            wards[i].floorNumber == floorNumber &&
+            wards[i].roomNumber == roomNumber) {
+            printf("楼宇号：%d\t楼层号：%d\t科室：%s\t房间号：%d\t床位数量：%d\n",
+                wards[i].buildingNumber, wards[i].floorNumber,
+                wards[i].department, wards[i].roomNumber, wards[i].bedCount);
+            found = 1;
+        }
+    }
+
+    if (!found) {
+        printf("未找到匹配的记录：楼宇号-%d 楼层号-%d 房间号-%d\n", buildingNumber, floorNumber, roomNumber);
+    }
+}
+
+// 保存数据
+void saveData() {
+    FILE *file;
+
+    // 打开文件以写入数据
+    file = fopen("C:\\Users\\gaoji\\Desktop\\资料\\病床管理系统\\data.txt", "w");
+    if (file == NULL) {
+        printf("保存数据失败。\n");
+        return;
+    }
+
+    // 写入患者数据
+    fprintf(file, "%d\n", patientCount);
+    for (int i = 0; i < patientCount; i++) {
+        fprintf(file, "%d %s %s %s %s %s %s\n",
+                patients[i].patientId, patients[i].name, patients[i].gender,
+                patients[i].ethnicity, patients[i].dob, patients[i].contactNumber,
+                patients[i].alternateNumber);
+    }
+
+    // 写入病房数据
+    fprintf(file, "%d\n", wardCount);
+    for (int i = 0; i < wardCount; i++) {
+        fprintf(file, "%d %d %s %d %d %s\n",
+                wards[i].buildingNumber, wards[i].floorNumber,
+                wards[i].department, wards[i].roomNumber,
+                wards[i].bedCount, wards[i].type);
+    }
+
+    // 写入病床数据
+    fprintf(file, "%d\n", bedCount);
+    for (int i = 0; i < bedCount; i++) {
+        fprintf(file, "%d %d %d %s\n",
+                beds[i].bedId, beds[i].bedNumber,
+                beds[i].roomNumber, beds[i].status);
+    }
+
+    fclose(file);
+    printf("数据已保存。\n");
+}
+
+// 加载数据
+void loadData() {
+    FILE *file;
+
+    // 尝试打开文件以读取数据
+    file = fopen("C:\\Users\\gaoji\\Desktop\\资料\\病床管理系统\\data.txt", "r");
+    if (file == NULL) {
+        printf("无法加载数据。\n");
+        return;
+    }
+
+    // 读取患者数据
+    fscanf(file, "%d", &patientCount);
+    for (int i = 0; i < patientCount; i++) {
+        fscanf(file, "%d %s %s %s %s %s %s\n",
+                &patients[i].patientId, patients[i].name, patients[i].gender,
+                patients[i].ethnicity, patients[i].dob, patients[i].contactNumber,
+                patients[i].alternateNumber);
+    }
+
+    // 读取病房数据
+    fscanf(file, "%d", &wardCount);
+    for (int i = 0; i < wardCount; i++) {
+        fscanf(file, "%d %d %s %d %d %s\n",
+                &wards[i].buildingNumber, &wards[i].floorNumber,
+                wards[i].department, &wards[i].roomNumber,
+                &wards[i].bedCount, wards[i].type);
+    }
+
+    // 读取病床数据
+    fscanf(file, "%d", &bedCount);
+    for (int i = 0; i < bedCount; i++) {
+        fscanf(file, "%d %d %d %s\n",
+                &beds[i].bedId, &beds[i].bedNumber,
+                &beds[i].roomNumber, beds[i].status);
+    }
+
+    fclose(file);
+    printf("数据已加载。\n");
+}
